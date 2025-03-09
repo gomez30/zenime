@@ -48,7 +48,7 @@ function AtoZ({ path }) {
     <div className="max-w-[1260px] mx-auto px-[15px] flex flex-col mt-[64px] max-md:mt-[50px]">
       <ul className="flex gap-x-2 mt-[50px] items-center w-fit max-[1200px]:hidden">
         <li className="flex gap-x-3 items-center">
-          <Link to="/" className="text-white hover:text-[#FFBADE] text-[17px]">
+          <Link to="/home" className="text-white hover:text-[#FFBADE] text-[17px]">
             Home
           </Link>
           <div className="dot mt-[1px] bg-white"></div>

@@ -32,7 +32,6 @@ function App() {
       <div className="app-container">
         <main className="content">
           {!isSplashScreen && <Navbar />}
-          {/* <Navbar /> */}
           <Routes>
             <Route path="/" element={<SplashScreen />} />
             <Route path="/home" element={<Home />} />

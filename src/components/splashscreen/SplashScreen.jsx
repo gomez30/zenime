@@ -18,7 +18,6 @@ const NAV_LINKS = [
   { to: "/top-airing", label: "Top Airing" },
 ];
 
-// Custom hook for fetching and caching top search data
 const useTopSearch = () => {
   const [topSearch, setTopSearch] = useState([]);
   useEffect(() => {

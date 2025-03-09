@@ -16,7 +16,7 @@ import { useLanguage } from "@/src/context/LanguageContext";
 import { useHomeInfo } from "@/src/context/HomeInfoContext";
 import Voiceactor from "@/src/components/voiceactor/Voiceactor";
 
-function InfoItem({ label, value, isProducer = true }) {
+function InfoItem({ label, value, isProducer = true }) { 
   return (
     value && (
       <div className="text-[14px] font-bold">
@@ -177,7 +177,7 @@ function AnimeInfo({ random = false }) {
           <div className="flex flex-col ml-4 gap-y-5 max-[575px]:items-center max-[575px]:justify-center max-[575px]:mt-6 max-[1200px]:ml-0">
             <ul className="flex gap-x-2 items-center w-fit max-[1200px]:hidden">
               {[
-                ["Home", ""],
+                ["Home", "home"],
                 [info.tvInfo?.showType, info.tvInfo?.showType],
               ].map(([text, link], index) => (
                 <li key={index} className="flex gap-x-3 items-center">

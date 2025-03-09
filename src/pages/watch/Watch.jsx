@@ -200,7 +200,7 @@ export default function Watch() {
           {animeInfo && (
             <ul className="flex absolute left-4 top-[-40px] gap-x-2 items-center w-fit max-[1200px]:hidden">
               {[
-                ["Home", ""],
+                ["Home", "home"],
                 [animeInfo?.showType, animeInfo?.showType],
               ].map(([text, link], index) => (
                 <li key={index} className="flex gap-x-3 items-center">
@@ -249,6 +249,8 @@ export default function Watch() {
                     episodeId={episodeId}
                     episodes={episodes}
                     playNext={(id) => setEpisodeId(id)}
+                    animeInfo={animeInfo}
+                    episodeNum={activeEpisodeNum}
                   />
                 ) : (
                   <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50">

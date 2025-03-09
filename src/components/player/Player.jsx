@@ -54,20 +54,18 @@ export default function Player({
   episodeId,
   episodes,
   playNext,
+  animeInfo,
+  episodeNum,
 }) {
   const artRef = useRef(null);
   const proxy = import.meta.env.VITE_PROXY_URL;
   const m3u8proxy = import.meta.env.VITE_M3U8_PROXY_URL?.split(",") || [];
-  const [playerProgress, setPlayerProgress] = useState(0);
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(
     episodes?.findIndex(
       (episode) => episode.id.match(/ep=(\d+)/)?.[1] === episodeId
     )
   );
 
-  useEffect(() => {
-    setPlayerProgress(0);
-  }, [episodeId]);
   useEffect(() => {
     if (episodes?.length > 0) {
       const newIndex = episodes.findIndex(
@@ -383,13 +381,9 @@ export default function Player({
       });
     });
     art.on("ready", () => {
-      art.currentTime = playerProgress;
       setTimeout(() => {
         art.layers[website_name].style.opacity = 0;
       }, 2000);
-      art.on("video:progress", () => {
-        setPlayerProgress(art.currentTime);
-      });
       const ranges = [
         ...(intro.start != null && intro.end != null
           ? [[intro.start + 1, intro.end - 1]]
@@ -483,6 +477,29 @@ export default function Player({
       if (art && art.destroy) {
         art.destroy(false);
       }
+      const continueWatching =
+        JSON.parse(localStorage.getItem("continueWatching")) || [];
+
+      const newEntry = {
+        data_id: animeInfo?.data_id,
+        episodeId,
+        episodeNum,
+        animeInfo,
+      };
+      if (!newEntry.data_id) return;
+      const existingIndex = continueWatching.findIndex(
+        (item) => item.data_id === newEntry.data_id
+      );
+
+      if (existingIndex !== -1) {
+        continueWatching[existingIndex] = newEntry;
+      } else {
+        continueWatching.push(newEntry);
+      }
+      localStorage.setItem(
+        "continueWatching",
+        JSON.stringify(continueWatching)
+      );
     };
   }, [streamUrl, subtitles, intro, outro]);
 
