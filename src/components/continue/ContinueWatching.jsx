@@ -124,7 +124,7 @@ const ContinueWatching = () => {
           ))}
         </Swiper>
 
-        {/* {showNavigation && (
+        {showNavigation && (
           <div className="absolute top-0 right-0 bottom-0 w-[45px] flex flex-col space-y-2 max-[759px]:hidden">
             <div className="btn-next bg-[#383747] h-[50%] flex justify-center items-center rounded-[8px] cursor-pointer transition-all duration-300 ease-out hover:bg-[#ffbade] hover:text-[#383747]">
               <FaChevronRight />
@@ -133,12 +133,12 @@ const ContinueWatching = () => {
               <FaChevronLeft />
             </div>
           </div>
-        )} */}
-        {showNavigation && (
+        )}
+        {/* {showNavigation && (
           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white bg-black bg-opacity-50 p-2 rounded-full z-20 animate-bounce transition-opacity duration-500">
             <FaChevronRight size={20} />
           </div>
-        )}
+        )}*/}
       </div>
     </div>
   );
