@@ -11,7 +11,7 @@ function Error({ error }) {
                 <p className="mt-5">Oops! We couldn&apos;t find this page.</p>
                 <button className="bg-[#ffbade] py-2 px-4 w-fit rounded-3xl text-black text-light flex items-center gap-x-2 mt-7">
                     <FaChevronLeft className="text-[#ffbade] w-[20px] h-[20px] rounded-full p-1 bg-black" />
-                    <p onClick={() => navigate('/')} className="text-[18px]">Back to homepage</p>
+                    <p onClick={() => navigate('/home')} className="text-[18px]">Back to homepage</p>
                 </button>
             </div>
         </div>

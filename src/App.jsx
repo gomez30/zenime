@@ -14,7 +14,7 @@ import "./App.css";
 import Search from "./pages/search/Search";
 import Watch from "./pages/watch/Watch";
 import Producer from "./components/producer/Producer";
-//import SplashScreen from "./components/splashscreen/SplashScreen";
+import SplashScreen from "./components/splashscreen/SplashScreen";
 
 function App() {
   const location = useLocation();
@@ -31,11 +31,11 @@ function App() {
     <HomeInfoProvider>
       <div className="app-container">
         <main className="content">
-          {/* {!isSplashScreen && <Navbar />} */}
-          <Navbar />
+          {!isSplashScreen && <Navbar />}
+          {/* <Navbar /> */}
           <Routes>
-            {/* <Route path="/" element={<SplashScreen />} /> */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<SplashScreen />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/:id" element={<AnimeInfo />} />
             <Route path="/watch/:id" element={<Watch />} />
             <Route path="/random" element={<AnimeInfo random={true} />} />
@@ -64,7 +64,7 @@ function App() {
             {/* Catch-all route for 404 */}
             <Route path="*" element={<Error error="404" />} />
           </Routes>
-          <Footer />
+          {!isSplashScreen && <Footer />}
         </main>
       </div>
     </HomeInfoProvider>
