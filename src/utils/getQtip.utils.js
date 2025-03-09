@@ -1,17 +1,17 @@
 import axios from "axios";
 
 const getQtip = async (id) => {
-  const worker_url = import.meta.env.VITE_WORKER_URL.split(",");
   try {
-    const response = await axios.get(
-      `${worker_url[Math.floor(Math.random() * worker_url?.length)]}/qtip/${id
-        .split("-")
-        .pop()}`
-    );
+    let workerUrls = import.meta.env.VITE_WORKER_URL?.split(",");
+    let baseUrl = workerUrls?.length
+      ? workerUrls[Math.floor(Math.random() * workerUrls.length)]
+      : import.meta.env.VITE_API_URL;
+    if (!baseUrl) throw new Error("No API endpoint defined.");
+    const response = await axios.get(`${baseUrl}/qtip/${id.split("-").pop()}`);
     return response.data.results;
   } catch (err) {
     console.error("Error fetching genre info:", err);
-    return err;
+    return null; 
   }
 };
 

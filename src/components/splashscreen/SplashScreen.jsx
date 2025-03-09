@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import "./SplashScreen.css";
 import logoTitle from "@/src/config/logoTitle";
@@ -8,6 +7,7 @@ import {
   faCircleArrowRight,
   faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
+import getTopSearch from "@/src/utils/getTopSearch.utils";
 
 // Static data moved outside the component
 const NAV_LINKS = [
@@ -21,37 +21,13 @@ const NAV_LINKS = [
 // Custom hook for fetching and caching top search data
 const useTopSearch = () => {
   const [topSearch, setTopSearch] = useState([]);
-
   useEffect(() => {
     const fetchTopSearch = async () => {
-      try {
-        const storedData = localStorage.getItem("topSearch");
-        if (storedData) {
-          const { data, timestamp } = JSON.parse(storedData);
-          const isExpired = Date.now() - timestamp > 7 * 24 * 60 * 60 * 1000; // 7 days
-          if (!isExpired) {
-            setTopSearch(data);
-            return;
-          }
-        }
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/top-search`
-        );
-        const results = response.data?.results || [];
-        if (results.length) {
-          setTopSearch(results);
-          localStorage.setItem(
-            "topSearch",
-            JSON.stringify({ data: results, timestamp: Date.now() })
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching top search data:", error);
-      }
+      const data = await getTopSearch();
+      if (data) setTopSearch(data);
     };
     fetchTopSearch();
   }, []);
-
   return topSearch;
 };
 
@@ -61,7 +37,6 @@ function SplashScreen() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const topSearch = useTopSearch();
 
-  // Unified search submission handler (using encodeURIComponent consistently)
   const handleSearchSubmit = useCallback(() => {
     const trimmedSearch = search.trim();
     if (!trimmedSearch) return;
@@ -69,7 +44,6 @@ function SplashScreen() {
     navigate(`/search?keyword=${queryParam}`);
   }, [search, navigate]);
 
-  // Handle Enter key to submit search
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === "Enter") {
