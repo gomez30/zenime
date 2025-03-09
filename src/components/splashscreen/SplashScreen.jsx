@@ -27,6 +27,7 @@ const useTopSearch = () => {
     };
     fetchTopSearch();
   }, []);
+  console.log(topSearch);
   return topSearch;
 };
 
