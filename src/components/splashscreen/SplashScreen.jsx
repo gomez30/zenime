@@ -166,7 +166,7 @@ function SplashScreen() {
           <div className="h-full w-[600px] absolute right-0 max-[780px]:hidden">
             <div className="splashoverlay"></div>
             <img
-              src="/splash.webp"
+              src="https://wsrv.nl/?url=//zenime.site/splash.webp"
               alt="Splash"
               className="bg-cover rounded-r-[40px] w-full h-full object-cover"
             />
