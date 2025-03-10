@@ -45,22 +45,24 @@
 }
 
 .swiper-horizontal > .swiper-pagination-bullets {
-  display: none !important;
+  display: none;
 }
 .swiper-pagination-bullet-active {
-  background-color: var(--theme) !important;
+  background-color: rgb(239, 213, 22) !important;
 }
-.swiper-horizontal > .swiper-pagination-bullets {
-  /* bottom: var(--swiper-pagination-bottom, 8px); */
-  bottom: 0;
-  right: 10px !important ;
-  left: auto !important;
-  width: 20px !important;
-  bottom: 5px !important;
-  display: flex !important;
-  gap: 13px;
-  align-items: center;
-  justify-content: center;
-  height: 80%;
-  flex-direction: column;
+@media only screen and (max-width: 575px) {
+  .swiper-horizontal > .swiper-pagination-bullets {
+    /* bottom: var(--swiper-pagination-bottom, 8px); */
+    bottom: 0;
+    right: 10px !important ;
+    left: auto !important;
+    width: 20px !important;
+    bottom: 5px !important;
+    display: flex !important;
+    gap: 18px;
+    align-items: center;
+    justify-content: center;
+    height: 80%;
+    flex-direction: column;
+  }
 }

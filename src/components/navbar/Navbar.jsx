@@ -55,7 +55,7 @@ function Navbar() {
     <SearchProvider>
       <nav
         className={`fixed top-0 left-0 w-full h-16 z-[1000000] flex p-4 py-8 items-center justify-between transition-all duration-300 ease-in-out ${
-          isNotHomePage ? "bg-[#201F31]" : "bg-opacity-0"
+          !isNotHomePage ? "bg-[#201F31]" : "bg-opacity-0"
         } ${
           isScrolled ? "bg-[#2D2B44] bg-opacity-90 backdrop-blur-md" : ""
         } max-[600px]:h-fit max-[600px]:flex-col max-[1200px]:bg-opacity-100 max-[600px]:py-2`}

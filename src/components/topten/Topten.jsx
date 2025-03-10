@@ -12,72 +12,66 @@ import Qtip from "../qtip/Qtip";
 function Topten({ data, className }) {
   const { language } = useLanguage();
   const [activePeriod, setActivePeriod] = useState("today");
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [hoverTimeout, setHoverTimeout] = useState(null);
+  const navigate = useNavigate();
+
   const handlePeriodChange = (period) => {
     setActivePeriod(period);
   };
-  const navigate = useNavigate();
+
   const handleNavigate = (id) => {
     navigate(`/${id}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const [hoveredItem, setHoveredItem] = useState(null);
+
   const currentData =
     activePeriod === "today"
       ? data.today
       : activePeriod === "week"
       ? data.week
       : data.month;
+
   const { tooltipPosition, tooltipHorizontalPosition, cardRefs } =
     useToolTipPosition(hoveredItem, currentData);
-  const [hoverTimeout, setHoverTimeout] = useState(null);
+
   const handleMouseEnter = (item, index) => {
-    const timeout = setTimeout(() => {
-      setHoveredItem(item.id + index);
-    }, 400);
-    setHoverTimeout(timeout);
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+    setHoveredItem(item.id + index);
   };
+
   const handleMouseLeave = () => {
-    clearTimeout(hoverTimeout);
-    setHoveredItem(null);
+    setHoverTimeout(
+      setTimeout(() => {
+        setHoveredItem(null);
+      }, 300) // Small delay to prevent flickering
+    );
   };
+
   return (
     <div className={`flex flex-col space-y-6 ${className}`}>
       <div className="flex justify-between items-center max-[350px]:flex-col max-[350px]:gap-y-2 max-[350px]:items-start">
         <h1 className="font-bold text-2xl text-[#ffbade]">Top 10</h1>
         <ul className="flex justify-between w-fit bg-[#373646] rounded-[4px] text-sm font-bold">
-          <li
-            className={`cursor-pointer p-2 px-3 ${
-              activePeriod === "today"
-                ? "bg-[#ffbade] text-[#555462] rounded-l-[4px]"
-                : "text-white"
-            } ${activePeriod !== "today" ? "hover:text-[#ffbade]" : ""}`}
-            onClick={() => handlePeriodChange("today")}
-          >
-            Today
-          </li>
-          <li
-            className={`cursor-pointer p-2 px-3 ${
-              activePeriod === "week"
-                ? "bg-[#ffbade] text-[#555462]"
-                : "text-white"
-            } ${activePeriod !== "week" ? "hover:text-[#ffbade]" : ""}`}
-            onClick={() => handlePeriodChange("week")}
-          >
-            Week
-          </li>
-          <li
-            className={`cursor-pointer p-2 px-3 ${
-              activePeriod === "month"
-                ? "bg-[#ffbade] text-[#555462] rounded-r-[4px]"
-                : "text-white"
-            } ${activePeriod !== "month" ? "hover:text-[#ffbade]" : ""}`}
-            onClick={() => handlePeriodChange("month")}
-          >
-            Month
-          </li>
+          {["today", "week", "month"].map((period) => (
+            <li
+              key={period}
+              className={`cursor-pointer p-2 px-3 ${
+                activePeriod === period
+                  ? "bg-[#ffbade] text-[#555462]"
+                  : "text-white hover:text-[#ffbade]"
+              } ${period === "today" ? "rounded-l-[4px]" : ""} ${
+                period === "month" ? "rounded-r-[4px]" : ""
+              }`}
+              onClick={() => handlePeriodChange(period)}
+            >
+              {period.charAt(0).toUpperCase() + period.slice(1)}
+            </li>
+          ))}
         </ul>
       </div>
-      <div className="flex flex-col space-y-4 bg-[#2B2A3C] p-4 pt-8 ">
+
+      <div className="flex flex-col space-y-4 bg-[#2B2A3C] p-4 pt-8">
         {currentData &&
           currentData.map((item, index) => (
             <div
@@ -86,8 +80,8 @@ function Topten({ data, className }) {
               ref={(el) => (cardRefs.current[index] = el)}
             >
               <h1
-                className={`font-bold text-2xl  ${
-                  index + 1 < 4
+                className={`font-bold text-2xl ${
+                  index < 3
                     ? "pb-1 text-white border-b-[3px] border-[#ffbade]"
                     : "text-[#777682]"
                 } max-[350px]:hidden`}
@@ -103,6 +97,7 @@ function Topten({ data, className }) {
                 }}
                 className="flex pb-4 relative container items-center"
               >
+                {/* Image with tooltip behavior */}
                 <img
                   src={item.poster}
                   alt={item.title}
@@ -111,22 +106,32 @@ function Topten({ data, className }) {
                   onMouseEnter={() => handleMouseEnter(item, index)}
                   onMouseLeave={handleMouseLeave}
                 />
+
+                {/* Tooltip positioned near image */}
                 {hoveredItem === item.id + index &&
                   window.innerWidth > 1024 && (
                     <div
-                      className={`absolute ${tooltipPosition} ${tooltipHorizontalPosition} ${
+                      className={`absolute ${tooltipPosition} ${tooltipHorizontalPosition} 
+                      ${
                         tooltipPosition === "top-1/2"
                           ? "translate-y-[50px]"
                           : "translate-y-[-50px]"
-                      } z-[100000] transform transition-all duration-300 ease-in-out ${
+                      } 
+                      z-[100000] transform transition-all duration-300 ease-in-out 
+                      ${
                         hoveredItem === item.id + index
                           ? "opacity-100 translate-y-0"
                           : "opacity-0 translate-y-2"
                       }`}
+                      onMouseEnter={() => {
+                        if (hoverTimeout) clearTimeout(hoverTimeout);
+                      }}
+                      onMouseLeave={handleMouseLeave}
                     >
                       <Qtip id={item.id} />
                     </div>
                   )}
+
                 <div className="flex flex-col ml-4 space-y-2">
                   <Link
                     to={`/${item.id}`}

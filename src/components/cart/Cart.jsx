@@ -18,16 +18,20 @@ function Cart({ label, data, path }) {
   const [hoverTimeout, setHoverTimeout] = useState(null);
   const { tooltipPosition, tooltipHorizontalPosition, cardRefs } =
     useToolTipPosition(hoveredItem, data);
-  const handleMouseEnter = (item, index) => {
-    const timeout = setTimeout(() => {
-      setHoveredItem(item.id + index);
-    }, 300);
-    setHoverTimeout(timeout);
+
+  const handleImageEnter = (item, index) => {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+    setHoveredItem(item.id + index);
   };
-  const handleMouseLeave = () => {
-    clearTimeout(hoverTimeout);
-    setHoveredItem(null);
+
+  const handleImageLeave = () => {
+    setHoverTimeout(
+      setTimeout(() => {
+        setHoveredItem(null);
+      }, 300) 
+    );
   };
+
   return (
     <div className="flex flex-col w-1/4 space-y-7 max-[1200px]:w-full">
       <h1 className="font-bold text-2xl text-[#ffbade] max-md:text-xl">
@@ -47,23 +51,28 @@ function Cart({ label, data, path }) {
                 alt={item.title}
                 className="flex-shrink-0 w-[60px] h-[75px] rounded-md object-cover cursor-pointer"
                 onClick={() => navigate(`/watch/${item.id}`)}
-                onMouseEnter={() => handleMouseEnter(item, index)}
-                onMouseLeave={handleMouseLeave}
+                onMouseEnter={() => handleImageEnter(item, index)}
+                onMouseLeave={handleImageLeave}
               />
+
               {hoveredItem === item.id + index && window.innerWidth > 1024 && (
                 <div
                   className={`absolute ${tooltipPosition} ${tooltipHorizontalPosition} 
-            ${
-              tooltipHorizontalPosition === "left-1/2"
-                ? "translate-x-[-100px]"
-                : "translate-x-[-200px]"
-            } 
-            z-[100000] transform transition-all duration-300 ease-in-out 
-            ${
-              hoveredItem === item.id + index
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-2"
-            }`}
+                    ${
+                      tooltipHorizontalPosition === "left-1/2"
+                        ? "translate-x-[-100px]"
+                        : "translate-x-[-200px]"
+                    } 
+                    z-[100000] transform transition-all duration-300 ease-in-out 
+                    ${
+                      hoveredItem === item.id + index
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-2"
+                    }`}
+                  onMouseEnter={() => {
+                    if (hoverTimeout) clearTimeout(hoverTimeout); 
+                  }}
+                  onMouseLeave={handleImageLeave}
                 >
                   <Qtip id={item.id} />
                 </div>
