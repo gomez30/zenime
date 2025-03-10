@@ -101,12 +101,12 @@ const ContinueWatching = () => {
                 </Link>
 
                 <div className="absolute bottom-0 left-0 flex flex-col gap-y-2 right-0 p-2 bg-gradient-to-t from-black via-black/80 to-transparent max-[450px]:gap-y-1">
-                  <p className="text-white text-md font-bold text-left truncate max-[900px]:text-sm max-[450px]:text-xs">
+                  <p className="text-white text-md font-bold text-left truncate max-[450px]:text-sm">
                     {language === "EN"
                       ? item.animeInfo?.title
                       : item.animeInfo?.japanese_title}
                   </p>
-                  <p className="text-gray-300 text-sm font-semibold text-left max-[450px]:text-[10px]">
+                  <p className="text-gray-300 text-sm font-semibold text-left max-[450px]:text-[12px]">
                     Episode {item.episodeNum}
                   </p>
                 </div>
