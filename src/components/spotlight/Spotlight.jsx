@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay, Pagination } from "swiper/modules";
+import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/autoplay";
 import "swiper/css/navigation";
@@ -25,14 +25,11 @@ const Spotlight = ({ spotlights }) => {
                 nextEl: ".button-next",
                 prevEl: ".button-prev",
               }}
-              pagination={{
-                clickable: true,
-              }}
               autoplay={{
                 delay: 3000,
                 disableOnInteraction: false,
               }}
-              modules={[Navigation, Autoplay, Pagination]}
+              modules={[Navigation, Autoplay]}
               className="h-[600px] max-[1390px]:h-full"
               style={{
                 "--swiper-pagination-bullet-inactive-color": "#ffffff",
