@@ -7,6 +7,8 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { FaHistory, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useLanguage } from "@/src/context/LanguageContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 const ContinueWatching = () => {
   const [watchList, setWatchList] = useState([]);
@@ -87,17 +89,28 @@ const ContinueWatching = () => {
 
                 <Link
                   to={`/watch/${item.animeInfo?.id}?ep=${item.episodeId}`}
-                  className="inline-block bg-[#2a2c31] absolute left-0 top-0 w-full h-full"
+                  className="inline-block bg-[#2a2c31] absolute left-0 top-0 w-full h-full group"
                 >
                   <img
                     src={item.animeInfo?.poster}
                     alt={item.animeInfo?.title}
-                    className="block w-full h-full object-cover hover:cursor-pointer"
+                    className="block w-full h-full object-cover transition-all duration-300 ease-in-out group-hover:blur-[4px]"
                     title={item.animeInfo?.title}
                     loading="lazy"
                   />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <FontAwesomeIcon
+                      icon={faPlay}
+                      className="text-[50px] text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[10000] max-[450px]:text-[36px]"
+                    />
+                  </div>
                 </Link>
-
+                {(item.animeInfo?.animeInfo?.tvInfo?.rating === "18+" ||
+                  item?.animeInfo?.adultContent === true) && (
+                  <div className="text-white px-2 rounded-md bg-[#FF5700] absolute top-2 left-2 flex items-center justify-center text-[14px] font-bold">
+                    18+
+                  </div>
+                )}
                 <div className="absolute bottom-0 left-0 flex flex-col gap-y-2 right-0 p-2 bg-gradient-to-t from-black via-black/80 to-transparent max-[450px]:gap-y-1">
                   <p className="text-white text-md font-bold text-left truncate max-[450px]:text-sm">
                     {language === "EN"
