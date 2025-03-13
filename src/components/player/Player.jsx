@@ -210,7 +210,7 @@ export default function Player({
 
   useEffect(() => {
     if (!streamUrl || !artRef.current) return;
-    const iframeUrl = null;
+    const iframeUrl = streamInfo?.streamLink?.iframe;
     const headers = {};
     if (iframeUrl) {
       const url = new URL(iframeUrl);
