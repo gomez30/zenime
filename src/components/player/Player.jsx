@@ -210,12 +210,12 @@ export default function Player({
 
   useEffect(() => {
     if (!streamUrl || !artRef.current) return;
-    const iframeUrl = streamInfo?.streamLink?.iframe;
+    const iframeUrl = streamInfo?.streamingLink?.iframe;
+    console.log(iframeUrl);
     const headers = {};
     if (iframeUrl) {
       const url = new URL(iframeUrl);
-      headers.Referer = url.origin;
-      headers.Origin = url.origin;
+      headers.Referer = url.origin + "/";
     }
     const art = new Artplayer({
       url:
