@@ -251,6 +251,7 @@ export default function Watch() {
                     playNext={(id) => setEpisodeId(id)}
                     animeInfo={animeInfo}
                     episodeNum={activeEpisodeNum}
+                    streamInfo={streamInfo}
                   />
                 ) : (
                   <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50">

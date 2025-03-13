@@ -56,6 +56,7 @@ export default function Player({
   playNext,
   animeInfo,
   episodeNum,
+  streamInfo,
 }) {
   const artRef = useRef(null);
   const proxy = import.meta.env.VITE_PROXY_URL;
@@ -209,9 +210,19 @@ export default function Player({
 
   useEffect(() => {
     if (!streamUrl || !artRef.current) return;
-
+    const iframeUrl = null;
+    const headers = {};
+    if (iframeUrl) {
+      const url = new URL(iframeUrl);
+      headers.Referer = url.origin;
+      headers.Origin = url.origin;
+    }
     const art = new Artplayer({
-      url: m3u8proxy[Math.floor(Math.random() * m3u8proxy?.length)] + streamUrl,
+      url:
+        m3u8proxy[Math.floor(Math.random() * m3u8proxy?.length)] +
+        streamUrl +
+        "&headers=" +
+        encodeURIComponent(JSON.stringify(headers)),
       container: artRef.current,
       type: "m3u8",
       autoplay: autoPlay,
