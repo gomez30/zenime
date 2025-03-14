@@ -68,19 +68,19 @@ const Schedule = () => {
     try {
       setLoading(true);
 
-      // Check if the data for the current date is already stored in localStorage
+      // Check if cached data exists
       const cachedData = localStorage.getItem(`schedule-${date}`);
       if (cachedData) {
-        setscheduleData(JSON.parse(cachedData));
+        const parsedData = JSON.parse(cachedData);
+        setscheduleData(Array.isArray(parsedData) ? parsedData : []);
       } else {
         const data = await getSchedInfo(date);
-        setscheduleData(data);
-        if (!data) {
-          localStorage.setItem(`schedule-${date}`, JSON.stringify([]));
-        } else localStorage.setItem(`schedule-${date}`, JSON.stringify(data));
+        console.log(data);
+        setscheduleData(Array.isArray(data) ? data : []);
+        localStorage.setItem(`schedule-${date}`, JSON.stringify(data || []));
       }
     } catch (err) {
-      console.error("Error fetching Sched info:", err);
+      console.error("Error fetching schedule info:", err);
       setError(err);
     } finally {
       setLoading(false);
@@ -199,39 +199,36 @@ const Schedule = () => {
         </div>
       ) : (
         <div className="flex flex-col mt-5 items-start">
-          {(showAll ? scheduleData : scheduleData.slice(0, 7)).map(
-            (item, idx) => (
-              <Link
-                to={`/${item.id}`}
-                className="w-full flex justify-between py-4 border-[#FFFFFF0D] border-b-[1px] group cursor-pointer max-[325px]:py-2"
-                key={idx}
-              >
-                <div className="flex items-center max-w-[500px] gap-x-7 max-[400px]:gap-x-2">
-                  <div
-                    className="text-lg font-semibold text-[#ffffff59] group-hover:text-[#ffbade] transition-all duration-300 ease-in-out max-[600px]:text-[14px]
-          max-[275px]:text-[12px]"
-                  >
-                    {item.time || "N/A"}
-                  </div>
-                  <h3
-                    className="text-[17px] font-semibold line-clamp-1 group-hover:text-[#ffbade] transition-all duration-300 ease-in-out max-[600px]:text-[14px]
-          max-[275px]:text-[12px]"
-                  >
-                    {item.title || "N/A"}
-                  </h3>
+          {(showAll
+            ? scheduleData
+            : Array.isArray(scheduleData)
+            ? scheduleData.slice(0, 7)
+            : []
+          ).map((item, idx) => (
+            <Link
+              to={`/${item.id}`}
+              key={idx}
+              className="w-full flex justify-between py-4 border-[#FFFFFF0D] border-b-[1px] group cursor-pointer max-[325px]:py-2"
+            >
+              <div className="flex items-center max-w-[500px] gap-x-7 max-[400px]:gap-x-2">
+                <div className="text-lg font-semibold text-[#ffffff59] group-hover:text-[#ffbade] transition-all duration-300 ease-in-out max-[600px]:text-[14px] max-[275px]:text-[12px]">
+                  {item.time || "N/A"}
                 </div>
-                <button className="max-w-[150px] flex items-center py-1 px-4 rounded-lg gap-x-2 group-hover:bg-[#ffbade] transition-all duration-300 ease-in-out">
-                  <FontAwesomeIcon
-                    icon={faPlay}
-                    className="mt-[1px] text-[10px] max-[320px]:text-[8px] group-hover:text-black transition-all duration-300 ease-in-out"
-                  />
-                  <p className="text-[14px] text-white group-hover:text-black transition-all duration-300 ease-in-out max-[275px]:text-[12px]">
-                    Episode {item.episode_no || "N/A"}
-                  </p>
-                </button>
-              </Link>
-            )
-          )}
+                <h3 className="text-[17px] font-semibold line-clamp-1 group-hover:text-[#ffbade] transition-all duration-300 ease-in-out max-[600px]:text-[14px] max-[275px]:text-[12px]">
+                  {item.title || "N/A"}
+                </h3>
+              </div>
+              <button className="max-w-[150px] flex items-center py-1 px-4 rounded-lg gap-x-2 group-hover:bg-[#ffbade] transition-all duration-300 ease-in-out">
+                <FontAwesomeIcon
+                  icon={faPlay}
+                  className="mt-[1px] text-[10px] max-[320px]:text-[8px] group-hover:text-black transition-all duration-300 ease-in-out"
+                />
+                <p className="text-[14px] text-white group-hover:text-black transition-all duration-300 ease-in-out max-[275px]:text-[12px]">
+                  Episode {item.episode_no || "N/A"}
+                </p>
+              </button>
+            </Link>
+          ))}
           {scheduleData.length > 7 && (
             <button
               onClick={toggleShowAll}
