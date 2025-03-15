@@ -54,13 +54,15 @@ export const useWatch = (animeId, initialEpisodeId) => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        // Fetch anime info
-        const animeData = await getAnimeInfo(animeId, false);
+        // Fetch anime info and episodes concurrently
+        const [animeData, episodesData] = await Promise.all([
+          getAnimeInfo(animeId, false),
+          getEpisodes(animeId),
+        ]);
+
         setAnimeInfo(animeData?.data);
         setSeasons(animeData?.seasons);
 
-        // Fetch episodes
-        const episodesData = await getEpisodes(animeId);
         setEpisodes(episodesData?.episodes);
         setTotalEpisodes(episodesData?.totalEpisodes);
 
@@ -78,6 +80,7 @@ export const useWatch = (animeId, initialEpisodeId) => {
         setAnimeInfoLoading(false);
       }
     };
+
     fetchInitialData();
   }, [animeId, initialEpisodeId]);
 
