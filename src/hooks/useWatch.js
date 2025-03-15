@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import getAnimeInfo from "@/src/utils/getAnimeInfo.utils";
 import getStreamInfo from "@/src/utils/getStreamInfo.utils";
 import getEpisodes from "@/src/utils/getEpisodes.utils";
@@ -21,14 +21,69 @@ export const useWatch = (animeId, initialEpisodeId) => {
   const [thumbnail, setThumbnail] = useState(null);
   const [intro, setIntro] = useState(null);
   const [outro, setOutro] = useState(null);
-  const [episodeId, setEpisodeId] = useState(initialEpisodeId);
+  const [episodeId, setEpisodeId] = useState(null);
   const [activeEpisodeNum, setActiveEpisodeNum] = useState(null);
   const [activeServerId, setActiveServerId] = useState(null);
   const [serverLoading, setServerLoading] = useState(true);
   const [nextEpisodeSchedule, setNextEpisodeSchedule] = useState(null);
+  const isServerFetchInProgress = useRef(false);
 
+  // Reset all states when animeId changes
   useEffect(() => {
-    const fetchNextEpisodeSchedule = async (animeId) => {
+    setEpisodes(null);
+    setEpisodeId(null); // Reset episodeId immediately to null
+    setActiveEpisodeNum(null);
+    setServers(null); // Clear servers to prevent premature stream fetch
+    setActiveServerId(null); // Clear activeServerId
+    setStreamInfo(null);
+    setStreamUrl(null);
+    setSubtitles([]);
+    setThumbnail(null);
+    setIntro(null);
+    setOutro(null);
+    setBuffering(true);
+    setServerLoading(true);
+    setError(null);
+    setAnimeInfo(null);
+    setSeasons(null);
+    setTotalEpisodes(null);
+    setAnimeInfoLoading(true);
+  }, [animeId]);
+
+  // Fetch anime info and episodes, then set episodeId
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        // Fetch anime info
+        const animeData = await getAnimeInfo(animeId, false);
+        setAnimeInfo(animeData?.data);
+        setSeasons(animeData?.seasons);
+
+        // Fetch episodes
+        const episodesData = await getEpisodes(animeId);
+        setEpisodes(episodesData?.episodes);
+        setTotalEpisodes(episodesData?.totalEpisodes);
+
+        // Set episodeId: prioritize initialEpisodeId, fallback to first episode
+        const newEpisodeId =
+          initialEpisodeId ||
+          (episodesData?.episodes?.length > 0
+            ? episodesData.episodes[0].id.match(/ep=(\d+)/)?.[1]
+            : null);
+        setEpisodeId(newEpisodeId);
+      } catch (err) {
+        console.error("Error fetching initial data:", err);
+        setError(err.message || "An error occurred.");
+      } finally {
+        setAnimeInfoLoading(false);
+      }
+    };
+    fetchInitialData();
+  }, [animeId, initialEpisodeId]);
+
+  // Fetch next episode schedule
+  useEffect(() => {
+    const fetchNextEpisodeSchedule = async () => {
       try {
         const data = await getNextEpisodeSchedule(animeId);
         setNextEpisodeSchedule(data);
@@ -36,42 +91,35 @@ export const useWatch = (animeId, initialEpisodeId) => {
         console.error("Error fetching next episode schedule:", err);
       }
     };
-    fetchNextEpisodeSchedule(animeId);
+    fetchNextEpisodeSchedule();
   }, [animeId]);
 
+  // Update activeEpisodeNum when episodeId or episodes change
   useEffect(() => {
-    const fetchAnimeInfo = async () => {
-      setAnimeInfoLoading(true);
-      try {
-        const data = await getAnimeInfo(animeId, false);
-        setAnimeInfo(data?.data);
-        setSeasons(data?.seasons);
-      } catch (err) {
-        console.error("Error fetching anime info:", err);
-        setError(err.message || "An error occurred.");
-      } finally {
-        setAnimeInfoLoading(false);
-      }
-    };
-    fetchAnimeInfo();
-  }, [animeId]);
+    if (!episodes || !episodeId) {
+      setActiveEpisodeNum(null);
+      return;
+    }
+    const activeEpisode = episodes.find((episode) => {
+      const match = episode.id.match(/ep=(\d+)/);
+      return match && match[1] === episodeId;
+    });
+    const newActiveEpisodeNum = activeEpisode ? activeEpisode.episode_no : null;
+    if (activeEpisodeNum !== newActiveEpisodeNum) {
+      setActiveEpisodeNum(newActiveEpisodeNum);
+    }
+  }, [episodeId, episodes]);
 
+  // Fetch servers only when episodeId and episodes are ready
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await getEpisodes(animeId);
-        setEpisodes(data?.episodes);
-        setTotalEpisodes(data?.totalEpisodes);
-      } catch (err) {
-        console.error("Error fetching episodes:", err);
-        setError(err.message || "An error occurred.");
-      }
-    })();
-  }, [animeId]);
+    if (!episodeId || !episodes || isServerFetchInProgress.current) return;
 
-  useEffect(() => {
-    (async () => {
+    const fetchServers = async () => {
+      isServerFetchInProgress.current = true;
       setServerLoading(true);
+      console.log(
+        `Fetching servers for animeId: ${animeId}, episodeId: ${episodeId}`
+      );
       try {
         const data = await getServers(animeId, episodeId);
         const filteredServers = data?.filter(
@@ -97,42 +145,37 @@ export const useWatch = (animeId, initialEpisodeId) => {
           ) ||
           data.find(
             (server) => server.type === "raw" && server.serverName === "HD-2"
-          );
-        setServerLoading(false);
+          ) ||
+          filteredServers[0];
         setActiveServerId(initialServer?.data_id);
       } catch (error) {
         console.error("Error fetching servers:", error);
-        setServerLoading(false);
         setError(error.message || "An error occurred.");
+      } finally {
+        setServerLoading(false);
+        isServerFetchInProgress.current = false;
       }
-    })();
-  }, [animeId, episodeId]);
+    };
+    fetchServers();
+  }, [episodeId, episodes]);
 
+  // Fetch stream info only when episodeId, activeServerId, and servers are ready
   useEffect(() => {
-    if (!episodes || !episodeId) {
-      setActiveEpisodeNum(null);
+    if (
+      !episodeId ||
+      !activeServerId ||
+      !servers ||
+      isServerFetchInProgress.current
+    )
       return;
-    }
-    const activeEpisode = episodes.find((episode) => {
-      const match = episode.id.match(/ep=(\d+)/);
-      return match && match[1] === episodeId;
-    });
 
-    const newActiveEpisodeNum = activeEpisode ? activeEpisode.episode_no : null;
-
-    if (activeEpisodeNum !== newActiveEpisodeNum) {
-      setActiveEpisodeNum(newActiveEpisodeNum);
-    }
-  }, [episodeId, episodes, activeEpisodeNum]);
-
-  useEffect(() => {
     const fetchStreamInfo = async () => {
-      if (!servers || !activeServerId) return;
       setBuffering(true);
-
+      console.log(
+        `Fetching stream for animeId: ${animeId}, episodeId: ${episodeId}, serverId: ${activeServerId}`
+      );
       try {
         const server = servers.find((srv) => srv.data_id === activeServerId);
-
         if (server) {
           const data = await getStreamInfo(
             animeId,
@@ -140,7 +183,6 @@ export const useWatch = (animeId, initialEpisodeId) => {
             server.serverName.toLowerCase(),
             server.type.toLowerCase()
           );
-
           setStreamInfo(data);
           setStreamUrl(data?.streamingLink?.link?.file || null);
           setIntro(data?.streamingLink?.intro || null);
@@ -150,7 +192,6 @@ export const useWatch = (animeId, initialEpisodeId) => {
               ?.filter((track) => track.kind === "captions")
               .map(({ file, label }) => ({ file, label })) || [];
           setSubtitles(subtitles);
-
           const thumbnailTrack = data?.streamingLink?.tracks?.find(
             (track) => track.kind === "thumbnails" && track.file
           );
@@ -163,12 +204,10 @@ export const useWatch = (animeId, initialEpisodeId) => {
         setError(err.message || "An error occurred.");
       } finally {
         setBuffering(false);
-        setServerLoading(false);
       }
     };
-
     fetchStreamInfo();
-  }, [animeId, episodeId, activeServerId, servers]);
+  }, [episodeId, activeServerId, servers]); // Removed animeId from dependencies
 
   return {
     error,
