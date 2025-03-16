@@ -215,6 +215,8 @@ export default function Player({
     if (iframeUrl) {
       const url = new URL(iframeUrl);
       headers.Referer = url.origin + "/";
+    }else{
+      headers.Referer = "https://megacloud.club/";
     }
     const art = new Artplayer({
       url:
