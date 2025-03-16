@@ -120,9 +120,6 @@ export const useWatch = (animeId, initialEpisodeId) => {
     const fetchServers = async () => {
       isServerFetchInProgress.current = true;
       setServerLoading(true);
-      console.log(
-        `Fetching servers for animeId: ${animeId}, episodeId: ${episodeId}`
-      );
       try {
         const data = await getServers(animeId, episodeId);
         const filteredServers = data?.filter(
@@ -174,9 +171,6 @@ export const useWatch = (animeId, initialEpisodeId) => {
 
     const fetchStreamInfo = async () => {
       setBuffering(true);
-      console.log(
-        `Fetching stream for animeId: ${animeId}, episodeId: ${episodeId}, serverId: ${activeServerId}`
-      );
       try {
         const server = servers.find((srv) => srv.data_id === activeServerId);
         if (server) {

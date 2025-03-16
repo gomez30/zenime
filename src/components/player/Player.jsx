@@ -491,10 +491,14 @@ export default function Player({
         JSON.parse(localStorage.getItem("continueWatching")) || [];
 
       const newEntry = {
+        id: animeInfo?.id,
         data_id: animeInfo?.data_id,
         episodeId,
         episodeNum,
-        animeInfo,
+        adultContent: animeInfo?.adultContent,
+        poster: animeInfo?.poster,
+        title: animeInfo?.title,
+        japanese_title: animeInfo?.japanese_title,
       };
       if (!newEntry.data_id) return;
       const existingIndex = continueWatching.findIndex(
